@@ -1,0 +1,53 @@
+IMPLEMENTATION MAP
+==================
+
+paper item                                   location
+-------------------------------------------- ------------------------------------------
+Eq.1  discrete-time hazard definition        archings/bridge.py (HazardHead)
+Eq.2  survival product S(t)                   archings/bridge.py (survival_from_hazard)
+Eq.3  state-space 3D encoder F = E(V)         archings/resonator.py (StateSpaceEncoder)
+Eq.4  Remnant-State Token cross-attention     archings/soul.py (RemnantStateToken)
+Eq.5  gated clinical-imaging fusion           archings/purfling.py (GatedFusion)
+Eq.6  FiLM modulation                         archings/purfling.py (FiLM)
+Eq.7  CRESCO composite objective              voicing/cresco.py (cresco_objective)
+Eq.8  censoring-aware NLL                      voicing/likelihood.py (nll_loss)
+Eq.9  differentiable D-calibration penalty    voicing/dcal.py (dcal_loss)
+Eq.10 hepatobiliary-phase anchoring           voicing/anchor.py (anchor_loss)
+Alg.1 forward pass + CRESCO step             archings/instrument.py, bench/loop.py
+
+architecture detail                          location
+-------------------------------------------- ------------------------------------------
+selective scan (input-dependent A,B,C,dt)    archings/resonator.py (SelectiveScan)
+Mamba-in-conv local branch                   archings/resonator.py (MambaBlock._branch)
+bidirectional scan                           archings/resonator.py (MambaBlock)
+K=8 learnable queries                        configs/model/earlst.yaml (rst.n_queries)
+T=12 two-month intervals                     configs/model/earlst.yaml (head.n_intervals)
+two-layer FiLM MLP                           archings/purfling.py (FiLM)
+HBP anchor regression head g_HBP             archings/soul.py (RemnantStateToken.anchor)
+progress-driven loss weighting               voicing/cresco.py (_ramp)
+VoCo + segmentation-prior pretraining        bench/pretrain.py, voicing/pretext.py
+
+metric / statistic                           location
+-------------------------------------------- ------------------------------------------
+Harrell concordance                          acoustics/discrimination.py (harrell_cindex)
+IPCW cumulative/dynamic 24-mo AUROC          acoustics/discrimination.py (ipcw_auroc)
+calibration slope                            acoustics/calibration.py (calibration_slope)
+integrated calibration index                 acoustics/calibration.py
+expected calibration error                   acoustics/calibration.py
+integrated Brier score (IPCW)                acoustics/calibration.py
+D-calibration goodness-of-fit p-value        acoustics/calibration.py (d_calibration_pvalue)
+decision-curve net benefit                   acoustics/benefit.py (net_benefit)
+DeLong paired AUROC test                     acoustics/inference.py (delong_test)
+McNemar paired test                          acoustics/inference.py (mcnemar_test)
+Holm / Benjamini-Hochberg                    acoustics/inference.py
+patient-level bootstrap CI (2,000)           acoustics/inference.py (bootstrap_ci)
+selective prediction with abstention         recital/report.py (_selective_auroc)
+per-cohort intercept recalibration           recital/report.py (_recalibrate_intercept)
+
+reported experiments                         config
+-------------------------------------------- ------------------------------------------
+Table 2 primary result                       configs/experiment/main.yaml
+component / backbone ablations               configs/experiment/ablation_*.yaml
+calibration-is-constructed ablation          configs/experiment/ablation_likelihood_only.yaml
+selective prediction (supp.)                 configs/experiment/supplementary_selective.yaml
+intercept recalibration (supp.)             configs/experiment/supplementary_recalibration.yaml

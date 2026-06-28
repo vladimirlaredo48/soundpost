@@ -1,0 +1,53 @@
+DATA SOURCES
+============
+
+The 24-month curative-resection recurrence endpoint exists only in the private
+EOB-RECUR cohort and is not redistributable. The public sets below are used for
+encoder pretraining and external context. Every link below was checked and was
+reachable at the time of writing.
+
+PRIMARY (private, restricted)
+-----------------------------
+EOB-RECUR
+  3200 patients, four sites, three vendors, three regions.
+  Five-phase Gd-EOB-DTPA MRI four-to-eight weeks after curative-intent (R0)
+  resection, hepatobiliary phase included, with >= 24 months of follow-up or a
+  documented recurrence event.
+  Access: upon reasonable request to the contributing institutions; governed by
+  institutional data-governance policies. Not downloadable.
+
+AUXILIARY (public; pretraining and external context only)
+---------------------------------------------------------
+LiTS - Liver Tumor Segmentation Benchmark
+  131 contrast-enhanced abdominal CT volumes with liver/tumour masks.
+  License: CC BY-NC-ND 4.0
+  https://competitions.codalab.org/competitions/17094
+
+ATLAS - Tumour and Liver Automatic Segmentation on CE-MRI
+  90 contrast-enhanced liver MRI volumes (unresectable HCC) with masks.
+  License: CC BY-NC-SA
+  https://atlas-challenge.u-bourgogne.fr/
+
+LLD-MMRI - Liver Lesion Diagnosis on Multi-phase MRI
+  Multi-phase liver-lesion MRI, seven lesion types.
+  License: research use (see repository)
+  https://github.com/LMMMEng/LLD-MMRI-Dataset
+  https://github.com/LMMMEng/LLD-MMRI2023
+
+CHAOS - Combined (CT-MR) Healthy Abdominal Organ Segmentation
+  Paired abdominal CT and MRI with organ masks.
+  License: CC BY-SA
+  https://zenodo.org/records/3431873
+  DOI: 10.5281/zenodo.3362844
+  https://chaos.grand-challenge.org/
+
+HCC-TACE-Seg - Multimodality annotated HCC, pre/post TACE
+  105 confirmed HCC patients, CT with segmentation and clinical data.
+  License: TCIA Data Usage Policy
+  https://www.cancerimagingarchive.net/collection/hcc-tace-seg/
+  DOI: 10.7937/TCIA.5FNA-0924
+
+TCGA-LIHC - Liver Hepatocellular Carcinoma radiogenomic collection
+  CT/MR multi-sequence imaging matched to TCGA genomic cases.
+  License: TCIA Data Usage Policy
+  https://www.cancerimagingarchive.net/collection/tcga-lihc/

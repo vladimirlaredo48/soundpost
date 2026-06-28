@@ -1,0 +1,11 @@
+name: ablation_swin_unetr
+model_ref: earlst
+data_ref: eob_recur
+train_ref: cresco
+optim_ref: main
+loss_ref: cresco
+pretrain_ref: voco_medsam
+evaluation_ref: prospective
+model:
+  encoder:
+    kind: swin_unetr

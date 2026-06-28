@@ -1,0 +1,49 @@
+PROJECT CONTEXT
+===============
+
+package            : soundpost
+study handle       : EARLST (early-postoperative recurrence, latent survival token)
+domain             : hepatobiliary oncologic imaging - survival-aware recurrence
+                     prediction from five-phase Gd-EOB-DTPA MRI of the post-resection
+                     remnant liver
+framework          : PyTorch (hand-rolled selective state-space / Mamba blocks, no
+                     mamba-ssm dependency); pydantic v2 config schemas; Click CLI;
+                     plain YAML on disk
+venue family       : Scientific Reports style single-column manuscript
+compute target     : not reported in manuscript; upper-bound profile fixed in
+                     configs/experiment/main.yaml (8x A100-80GB, fp32, effective
+                     batch 256, lr 2e-5, 800 epochs, 10 seeds)
+hparams reference  : Implementation and training paragraph (K=8 RST queries, T=12
+                     two-month bins, two-layer FiLM MLP, ten-seed averaging,
+                     prospective AUROC 0.91 +/- 0.008 worst 0.898, C-index
+                     0.81 +/- 0.008 worst 0.794)
+
+DATA LAYERS
+-----------
+Primary (private, restricted, NOT redistributable): EOB-RECUR, 3200 patients, four
+sites, three vendors, three regions. Carries the only curative-resection 24-month
+recurrence endpoint. Available upon reasonable request to the contributing
+institutions; cannot be downloaded.
+
+Auxiliary public (encoder pretraining + external context only; verified live):
+  LiTS         CC BY-NC-ND 4.0   competitions.codalab.org/competitions/17094
+  ATLAS        CC BY-NC-SA       atlas-challenge.u-bourgogne.fr
+  LLD-MMRI     research use      github.com/LMMMEng/LLD-MMRI-Dataset
+  CHAOS        CC BY-SA          zenodo.org/records/3431873  (10.5281/zenodo.3362844)
+  HCC-TACE-Seg TCIA DUA          cancerimagingarchive.net/collection/hcc-tace-seg
+  TCGA-LIHC    TCIA DUA          cancerimagingarchive.net/collection/tcga-lihc
+None of the public sets provide the curative-resection recurrence label.
+
+EQUATION INVENTORY
+------------------
+Eq.1  discrete-time hazard definition          archings/bridge.py
+Eq.2  survival product                         archings/bridge.py
+Eq.3  state-space 3D encoder                   archings/resonator.py
+Eq.4  Remnant-State Token cross-attention      archings/soul.py
+Eq.5  gated clinical-imaging fusion            archings/purfling.py
+Eq.6  FiLM modulation                          archings/purfling.py
+Eq.7  CRESCO composite objective               voicing/cresco.py
+Eq.8  censoring-aware NLL                       voicing/likelihood.py
+Eq.9  differentiable D-calibration penalty     voicing/dcal.py
+Eq.10 HBP anchoring regression                 voicing/anchor.py
+Alg.1 forward pass + CRESCO step               archings/instrument.py, bench/loop.py

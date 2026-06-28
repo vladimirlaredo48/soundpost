@@ -1,0 +1,10 @@
+root: data/eob_recur
+dev_sites: [A, B]
+external_site: C
+prospective_site: D
+t_max_months: 24
+interval_months: 2
+val_fraction: 0.2
+num_workers: 8
+synthetic: false
+synthetic_size: 256

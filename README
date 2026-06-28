@@ -1,0 +1,123 @@
+soundpost
+=========
+
+EARLST is a survival-aware model that reads the early-postoperative five-phase
+Gd-EOB-DTPA MRI of the remnant liver and predicts the risk of hepatocellular
+carcinoma recurrence over the first twenty-four months after curative-intent
+resection. A three-dimensional state-space encoder reads the co-registered
+phases; a small set of learnable queries distils the post-resection parenchyma
+into an inspectable Remnant-State Token anchored to the hepatobiliary-phase
+enhancement signal; a gated FiLM stage folds in the clinical-laboratory vector;
+and a censoring-aware discrete-time head emits a calibrated recurrence-free
+survival curve over twelve two-month intervals. Training uses the CRESCO
+objective, which combines the censoring-aware likelihood with a differentiable
+D-calibration term, a patient-pair ranking term and a hepatobiliary-phase
+anchoring term so the probability scale is calibrated during training rather
+than rescaled afterwards.
+
+This package name borrows from instrument making: the soundpost is the small
+dowel that carries an instrument's voice, the same role the Remnant-State Token
+plays here.
+
+Layout
+------
+  src/soundpost/tonewood    five-phase preprocessing, clinical encoding, cohorts
+  src/soundpost/archings    encoders, Remnant-State Token, FiLM fusion, hazard head
+  src/soundpost/voicing     CRESCO terms and the encoder pretext objectives
+  src/soundpost/acoustics   discrimination, calibration and inference statistics
+  src/soundpost/bench       optimiser, schedule, AMP, EMA, checkpointing, trainer
+  src/soundpost/recital     prediction gathering and the metric report
+  src/soundpost/jigs        seeding, logging, config loading
+  src/soundpost/workshop    train / evaluate / infer / export entry points
+  configs/                  composable model, data, train, optim, loss, eval groups
+
+Installation
+------------
+pip:
+    python -m venv .venv && source .venv/bin/activate
+    pip install -r requirements.txt
+    pip install -e .
+
+conda:
+    conda env create -f environment.yml
+    conda activate soundpost
+    pip install -e .
+
+docker:
+    docker build -t soundpost .
+    docker run --gpus all -it soundpost --help
+
+The pinned stack is CUDA 11.7 with PyTorch 1.13.1 and Python 3.9; the selective
+scan is written in plain PyTorch, so no custom CUDA kernels are required.
+
+Data
+----
+The twenty-four-month curative-resection recurrence endpoint exists only in the
+private EOB-RECUR cohort (3,200 patients, four sites, three vendors). It is
+available upon reasonable request to the contributing institutions and cannot be
+redistributed. The public liver datasets used for encoder pretraining and
+external context, with their licences and verified access URLs, are listed in
+sources.txt; run scripts/prepare_data.sh for a checklist. Each cohort manifest
+is a JSON-lines file whose records point at the per-phase volume arrays, the
+optional remnant-liver mask, the clinical fields, the time in months and the
+event indicator.
+
+A planted-signal synthetic cohort ships with the package (tonewood/synth.py) so
+the full pipeline runs without any download; enable it with data.synthetic=true.
+
+Training
+--------
+Primary result on the development sites:
+    bash scripts/launch_train.sh configs/experiment/main.yaml data/eob_recur/train.jsonl
+
+or directly:
+    python -m soundpost.workshop train --config configs/experiment/main.yaml \
+        --manifest data/eob_recur/train.jsonl --device cuda
+
+Each reported ablation has its own experiment file:
+    configs/experiment/ablation_no_rst.yaml          drop the Remnant-State Token
+    configs/experiment/ablation_no_pretrain.yaml     skip VoCo + segmentation prior
+    configs/experiment/ablation_swin_unetr.yaml      swap in the Swin backbone
+    configs/experiment/ablation_resnet3d.yaml        swap in the 3D-ResNet backbone
+    configs/experiment/ablation_likelihood_only.yaml CRESCO reduced to the likelihood
+    configs/experiment/supplementary_selective.yaml  abstention / selective prediction
+    configs/experiment/supplementary_recalibration.yaml  per-cohort intercept shift
+
+Reported numbers are averaged over the ten seeds in configs/train/cresco.yaml.
+
+Evaluation
+----------
+    python -m soundpost.workshop evaluate --config configs/experiment/main.yaml \
+        --checkpoint runs/earlst/final.ckpt --manifest data/eob_recur/prospective.jsonl
+
+Expected prospective primary cohort (Site D, n=1,080), mean over ten seeds:
+    24-month AUROC          0.91  (95% CI 0.89-0.93; worst seed 0.898)
+    Harrell concordance     0.81  (95% CI 0.78-0.83; worst seed 0.794)
+    calibration slope       0.94      integrated calibration index 0.042
+    net benefit @ 0.40      0.214     selective AUROC after 10% abstention 0.935
+The likelihood-only ablation drops the slope to 0.78 and the D-calibration
+p-value from 0.42 to 0.004; removing the Remnant-State Token drops AUROC to 0.88.
+
+Export
+------
+    python -m soundpost.workshop export --config configs/experiment/main.yaml \
+        --checkpoint runs/earlst/final.ckpt --output earlst_head.onnx
+This traces the fusion-plus-hazard pathway given a Remnant-State vector and the
+clinical embedding; the sequential state-space scan is kept in PyTorch.
+
+Compute budget
+--------------
+The manuscript does not report a hardware profile. The defaults in
+configs/experiment/main.yaml target 8x NVIDIA A100-80GB in fp32 at full
+resolution: per-device micro-batch 2 with gradient accumulation 16 over 8 ranks
+gives an effective batch of 256, AdamW at 2e-5 with 2,000 warmup steps and a
+cosine decay over 800 epochs, EMA decay 0.9999. Full-resolution five-phase
+128x128x128 volumes with the sequential scan make this storage- and
+memory-heavy; budget several days of multi-GPU wall-clock and tens of gigabytes
+of preprocessed volume cache.
+
+Checkpoints
+-----------
+Checkpoints are written atomically and carry the optimiser state, the EMA shadow,
+the resolved config and the random seed. Released weights are available upon
+reasonable request.

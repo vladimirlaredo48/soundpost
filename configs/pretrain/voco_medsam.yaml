@@ -1,0 +1,5 @@
+enabled: true
+voco_crops: 4
+voco_temperature: 0.07
+seg_prior_weight: 0.5
+steps: 50000

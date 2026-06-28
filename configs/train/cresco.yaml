@@ -1,0 +1,11 @@
+seed: 1337
+seeds: [1337, 7, 11, 23, 42, 71, 101, 202, 303, 404]
+epochs: 800
+micro_batch_size: 2
+grad_accum: 16
+world_size: 8
+precision: fp32
+ema_decay: 0.9999
+log_every: 50
+ckpt_every: 1000
+out_dir: runs/earlst

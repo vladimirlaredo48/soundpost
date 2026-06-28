@@ -1,0 +1,24 @@
+DEVIATIONS
+==========
+
+1. Differentiable D-calibration (Eq. 9).
+   The training penalty in voicing/dcal.py assigns predicted-CIF values to bins
+   with a temperature-softened membership (a softmax over squared distances to
+   bin centres for events, a smoothed step for censored mass) so the term is
+   differentiable, as Eq. (9) requires of an in-training loss. The
+   evaluation-time D-calibration goodness-of-fit p-value in
+   acoustics/calibration.py uses the standard hard binning with the Haider
+   censored-mass spreading. The two agree in the hard-assignment limit.
+
+2. Compute profile.
+   The manuscript does not report a hardware profile. configs/experiment/main.yaml
+   fixes an upper-bound profile (8x A100-80GB, fp32, effective batch 256,
+   lr 2e-5, 800 epochs, ten seeds); see README and docs/PROVENANCE. No reduced
+   quick-start default is provided; configs/experiment/_smoke.yaml exists only
+   for the test suite.
+
+3. ONNX export scope.
+   workshop/export.py traces the gated-fusion and discrete-time hazard pathway
+   given a Remnant-State vector and the clinical embedding. The sequential
+   selective-scan encoder is left in PyTorch because the recurrence does not
+   trace to a portable static graph.

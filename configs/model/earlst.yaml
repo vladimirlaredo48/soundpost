@@ -1,0 +1,40 @@
+use_rst: true
+volume:
+  n_phases: 5
+  channels: 1
+  size: [128, 128, 128]
+  spacing_mm: 1.0
+clinical:
+  continuous: [afp_log, age, tumour_size_cm]
+  categorical:
+    albi_grade: 3
+    bclc_stage: 4
+    mvi: 2
+    aetiology: 4
+    resection_margin: 3
+    sex: 2
+    vendor: 3
+  embed_dim: 16
+encoder:
+  kind: ssm
+  patch_size: 8
+  d_model: 192
+  depth: 12
+  d_state: 16
+  expand: 2
+  conv_kernel: 4
+  dropout: 0.0
+  bidirectional: true
+rst:
+  n_queries: 8
+  n_heads: 4
+  hbp_hidden: 64
+fusion:
+  hidden: 192
+  film_hidden: 128
+  film_layers: 2
+head:
+  n_intervals: 12
+  body_hidden: 128
+  body_layers: 2
+  dropout: 0.1

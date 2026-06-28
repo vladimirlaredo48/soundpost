@@ -1,0 +1,9 @@
+lambda_cal_start: 0.1
+lambda_cal_end: 1.0
+lambda_rank_start: 1.0
+lambda_rank_end: 0.2
+lambda_aux: 0.1
+dcal_bins: 10
+dcal_temperature: 0.05
+rank_temperature: 0.1
+likelihood_only: false

@@ -1,0 +1,51 @@
+name: smoke
+model:
+  use_rst: true
+  volume:
+    n_phases: 5
+    channels: 1
+    size: [16, 16, 16]
+  encoder:
+    kind: ssm
+    patch_size: 8
+    d_model: 32
+    depth: 2
+    d_state: 8
+    expand: 2
+    conv_kernel: 3
+  rst:
+    n_queries: 4
+    n_heads: 2
+    hbp_hidden: 16
+  fusion:
+    hidden: 32
+    film_hidden: 16
+    film_layers: 2
+  head:
+    n_intervals: 4
+    body_hidden: 16
+    body_layers: 2
+    dropout: 0.0
+data:
+  synthetic: true
+  synthetic_size: 16
+  interval_months: 6
+train:
+  seed: 0
+  epochs: 2
+  micro_batch_size: 4
+  grad_accum: 1
+  world_size: 1
+  precision: fp32
+  log_every: 1
+  ckpt_every: 100000
+  out_dir: runs/smoke
+optim:
+  lr: 0.001
+  weight_decay: 0.0
+  warmup_steps: 1
+loss:
+  dcal_bins: 4
+evaluation:
+  bootstrap_resamples: 50
+# for unit-test smoke only; do not use for reporting

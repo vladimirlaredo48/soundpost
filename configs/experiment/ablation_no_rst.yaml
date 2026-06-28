@@ -1,0 +1,12 @@
+name: ablation_no_rst
+model_ref: earlst
+data_ref: eob_recur
+train_ref: cresco
+optim_ref: main
+loss_ref: cresco
+pretrain_ref: voco_medsam
+evaluation_ref: prospective
+model:
+  use_rst: false
+loss:
+  lambda_aux: 0.0
